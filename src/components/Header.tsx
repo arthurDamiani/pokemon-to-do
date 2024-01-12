@@ -20,7 +20,7 @@ export const Header = ({searchTerm, suggestions, handleInputChange, handleSugges
             searchTerm={searchTerm} 
             suggestions={suggestions} 
             handleInputChange={handleInputChange}
-            handleSuggestionClick={handleSuggestionClick} 
+            handleSuggestionClick={handleSuggestionClick}
           />
           <button
             type="submit"

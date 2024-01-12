@@ -23,8 +23,13 @@ function PokemonList() {
     setCallApi(false);
     const data = await getPokemons(searchTerm, handleGetAllPokemons);
     if(data.id) {
-      addPokemon(data);
+      const pokemonAlreadyAdded = pokemonsAdded.filter((value) => value.id === data.id).length;
       setSearchTerm('');
+      if(pokemonAlreadyAdded) {
+        alert('Pokemon já adicionado!');
+        return;
+      }
+      addPokemon(data);
     }
   };
 
@@ -50,6 +55,7 @@ function PokemonList() {
   const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setCallApi(true);
+    setSuggestions([]);
   };
 
   const { isLoading, isError, error } = useQuery<void, Error>(
@@ -65,14 +71,15 @@ function PokemonList() {
   };
 
   const filterApply = (pokemon: PokemonDetailedItem) => {
+    const PokemonComponent = <PokemonBox key={pokemon.id} pokemon={pokemon} />;
     if(filter === 'none') {
-      return <PokemonBox pokemon={pokemon} />
+      return PokemonComponent
     }
     if(filter === 'captured' && capturedPokemons.includes(pokemon.name)) {
-      return <PokemonBox pokemon={pokemon} />
+      return PokemonComponent
     }
     if(filter === 'not-captured' && !capturedPokemons.includes(pokemon.name)) {
-      return <PokemonBox pokemon={pokemon} />
+      return PokemonComponent
     }
   }
 
