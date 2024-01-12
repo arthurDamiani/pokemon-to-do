@@ -10,7 +10,6 @@ interface InputProps {
 
 export const Input = ({ searchTerm, suggestions, handleInputChange, handleSuggestionClick }: InputProps) => {
   const [selectedSuggestion, setSelectedSuggestion] = useState<number | null>(null);
-  const [isSuggestionSelected, setIsSuggestionSelected] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -36,14 +35,12 @@ export const Input = ({ searchTerm, suggestions, handleInputChange, handleSugges
     if (selectedSuggestion !== null) {
       e.preventDefault();
       handleSuggestionClick(suggestions[selectedSuggestion]);
-      setIsSuggestionSelected(true);
     }
   };
 
   const handleTabPress = () => {
     if (selectedSuggestion !== null) {
       handleSuggestionClick(suggestions[selectedSuggestion]);
-      setIsSuggestionSelected(true);
     } else if (suggestions.length > 0) {
       const selectedPokemon = suggestions[0];
       const remainingCharacters = selectedPokemon.name.slice(searchTerm.length);
@@ -88,7 +85,6 @@ export const Input = ({ searchTerm, suggestions, handleInputChange, handleSugges
                 onClick={() => handleSuggestionClick(pokemon)}
                 onMouseEnter={() => {
                   setSelectedSuggestion(index);
-                  setIsSuggestionSelected(false);
                 }}
               >
                 {pokemon.name}
