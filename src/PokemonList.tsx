@@ -1,29 +1,37 @@
-import { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useQuery } from 'react-query';
-
-interface Pokemon {
-  name: string;
-}
+import { getAllPokemons, getPokemons } from './services/pokemon.service';
+import { PokemonDetailedItem, SimplePokemonItem } from './interfaces/pokemon';
+import { PokemonListContext } from './contexts/PokemonList.context';
+import PokemonBox from './components/PokemonBox';
+import { Header } from './components/Header';
 
 function PokemonList() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [suggestions, setSuggestions] = useState<Pokemon[]>([]);
+  const { pokemonsAdded, capturedPokemons, addPokemon } = useContext(PokemonListContext);
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [filter, setFilter] = useState<string>('none');
+  const [suggestions, setSuggestions] = useState<SimplePokemonItem[]>([]);
+  const [allPokemons, setAllPokemons] = useState<SimplePokemonItem[]>([]);
+  const [callApi, setCallApi] = useState<boolean>(true);
 
-  const getAllPokemons = async (): Promise<Pokemon[]> => {
-    const response = await fetch('https://pokeapi.co/api/v2/pokemon/');
-    if (!response.ok) {
-      throw new Error('An error occurred while fetching Pokémon');
-    }
-    const data = await response.json();
-    const pokemons = data.results.map((result: { name: string }) => ({ name: result.name }));
-    return pokemons;
+  const handleGetAllPokemons = async () => {
+    const pokemons = await getAllPokemons();
+    setAllPokemons(pokemons);
   };
 
-  const handleInputChange = async (value: string) => {
+  const handleGetPokemon = async () => {
+    setCallApi(false);
+    const data = await getPokemons(searchTerm, handleGetAllPokemons);
+    if(data.id) {
+      addPokemon(data);
+      setSearchTerm('');
+    }
+  };
+
+  const handleInputChange = (value: string) => {
     setSearchTerm(value);
 
     if (value) {
-      const allPokemons = await getAllPokemons();
       const filteredPokemons = allPokemons.filter((pokemon) =>
         pokemon.name.toLowerCase().includes(value.toLowerCase())
       );
@@ -33,76 +41,66 @@ function PokemonList() {
     }
   };
 
-  const getPokemons = async (): Promise<Pokemon[]> => {
-    if (!searchTerm) {
-      return [];
-    }
-
-    const apiUrl = `https://pokeapi.co/api/v2/pokemon/${searchTerm.toLowerCase()}`;
-    const response = await fetch(apiUrl);
-
-    if (!response.ok) {
-      throw new Error('An error occurred while fetching Pokémon');
-    }
-
-    const data = await response.json();
-
-    if (Array.isArray(data.forms)) {
-      return [{ name: data.forms[0].name }];
-    } else if (Array.isArray(data.results)) {
-      return data.results;
-    } else {
-      return [];
-    }
+  const handleSuggestionClick = (selectedPokemon: SimplePokemonItem) => {
+    setSearchTerm(selectedPokemon.name);
+    setSuggestions([]);
+    setCallApi(false);
   };
-
-  const { isLoading, isError, data, error } = useQuery<Pokemon[], Error>(
-    ['pokemon', searchTerm],
-    getPokemons,
-    {
-      enabled: !!searchTerm, // Only fetch when searchTerm is truthy
-    }
-  );
 
   const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    getPokemons();
+    setCallApi(true);
   };
+
+  const { isLoading, isError, error } = useQuery<void, Error>(
+    ['pokemon', searchTerm],
+    handleGetPokemon,
+    {
+      enabled: callApi,
+    }
+  );
+
+  const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setFilter(event.target.value);
+  };
+
+  const filterApply = (pokemon: PokemonDetailedItem) => {
+    if(filter === 'none') {
+      return <PokemonBox pokemon={pokemon} />
+    }
+    if(filter === 'captured' && capturedPokemons.includes(pokemon.name)) {
+      return <PokemonBox pokemon={pokemon} />
+    }
+    if(filter === 'not-captured' && !capturedPokemons.includes(pokemon.name)) {
+      return <PokemonBox pokemon={pokemon} />
+    }
+  }
 
   return (
     <>
-      <header className="py-4 text-center bg-blue-500">
-        <h1 className="text-3xl font-bold">Pokémon Search</h1>
-        <div className="mt-4 mx-auto max-w-md">
-          <form onSubmit={handleFormSubmit}>
-            <input
-              type="text"
-              placeholder="Search"
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:border-yellow-500"
-              value={searchTerm}
-              onChange={(e) => handleInputChange(e.target.value)}
-            />
-            <button type="submit" className="hidden">
-              Search
-            </button>
-          </form>
-          <ul>
-            {suggestions.map((pokemon) => (
-              <li key={pokemon.name}>{pokemon.name}</li>
-            ))}
-          </ul>
-        </div>
-      </header>
+      <Header 
+        searchTerm={searchTerm} 
+        suggestions={suggestions}
+        handleFormSubmit={handleFormSubmit}
+        handleInputChange={handleInputChange}
+        handleSuggestionClick={handleSuggestionClick}
+      />
 
-      <main className="container mx-auto mt-8">
+      <main className='container mx-auto mt-8'>
+      <select
+        className='bg-white border px-4 py-2 rounded-r-md ml-2'
+        onChange={handleFilterChange}
+      >
+        <option value='none'>Sem filtro</option>
+        <option value='captured'>Capturados</option>
+        <option value='not-captured'>A capturar</option>
+      </select>
         {isLoading && <p>Loading...</p>}
         {isError && <p>Error: {error?.message}</p>}
-        {data && (
-          <ul>
-            {data.map((pokemon) => (
-              <li key={pokemon.name}>{pokemon.name}</li>
-            ))}
-          </ul>
+        {pokemonsAdded.length > 0 && (
+          <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4'>
+            {pokemonsAdded.map((pokemon) => filterApply(pokemon))}
+          </div>
         )}
       </main>
     </>
