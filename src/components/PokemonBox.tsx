@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import { useContext } from 'react';
 import { PokemonDetailedItem } from '../interfaces/pokemon';
 import { PokemonListContext } from '../contexts/PokemonList.context';
 

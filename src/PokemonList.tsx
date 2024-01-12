@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import { useQuery } from 'react-query';
 import { getAllPokemons, getPokemons } from './services/pokemon.service';
 import { PokemonDetailedItem, SimplePokemonItem } from './interfaces/pokemon';
