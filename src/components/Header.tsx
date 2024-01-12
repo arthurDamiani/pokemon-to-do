@@ -1,12 +1,12 @@
-import { SimplePokemonItem } from "../interfaces/pokemon";
-import { Input } from "./Input";
+import { SimplePokemonItem } from "../interfaces/pokemon"
+import { Input } from "./Input"
 
 interface HeaderProps {
-  searchTerm: string;
-  suggestions: SimplePokemonItem[];
-  handleInputChange: (value: string) => void;
-  handleSuggestionClick: (selectedPokemon: SimplePokemonItem) => void;
-  handleFormSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
+  searchTerm: string
+  suggestions: SimplePokemonItem[]
+  handleInputChange: (value: string) => void
+  handleSuggestionClick: (selectedPokemon: SimplePokemonItem) => void
+  handleFormSubmit: (event: React.FormEvent<HTMLFormElement>) => void
 }
 
 export const Header = ({searchTerm, suggestions, handleInputChange, handleSuggestionClick, handleFormSubmit}: HeaderProps) => {

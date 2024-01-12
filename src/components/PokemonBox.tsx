@@ -1,15 +1,15 @@
-import { useContext } from 'react';
-import { PokemonDetailedItem } from '../interfaces/pokemon';
-import { PokemonListContext } from '../contexts/PokemonList.context';
+import { useContext } from 'react'
+import { PokemonDetailedItem } from '../interfaces/pokemon'
+import { PokemonListContext } from '../contexts/PokemonList.context'
 
 interface PokemonBoxProps {
-  pokemon: PokemonDetailedItem;
+  pokemon: PokemonDetailedItem
 }
 
 const PokemonBox: React.FC<PokemonBoxProps> = ({ pokemon }) => {
-  const { capturedPokemons, capturePokemon } = useContext(PokemonListContext);
-  const spriteUrl = pokemon.sprites.front_default ? pokemon.sprites.front_default : pokemon.sprites.back_default ?? '';
-  const isCaptured = capturedPokemons.includes(pokemon.name);
+  const { capturedPokemons, capturePokemon } = useContext(PokemonListContext)
+  const spriteUrl = pokemon.sprites.front_default ? pokemon.sprites.front_default : pokemon.sprites.back_default ?? ''
+  const isCaptured = capturedPokemons.includes(pokemon.name)
 
   const handleButtonClick = () => {
     if(isCaptured) {
@@ -38,7 +38,7 @@ const PokemonBox: React.FC<PokemonBoxProps> = ({ pokemon }) => {
         </button>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default PokemonBox;
+export default PokemonBox

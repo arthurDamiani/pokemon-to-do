@@ -1,9 +1,9 @@
-import { QueryClient, QueryClientProvider } from 'react-query';
-import PokemonList from './PokemonList';
-import { ReactQueryDevtools } from 'react-query/devtools';
-import { PokemonListContextProvider } from './contexts/PokemonList.context';
+import { QueryClient, QueryClientProvider } from 'react-query'
+import PokemonList from './PokemonList'
+import { ReactQueryDevtools } from 'react-query/devtools'
+import { PokemonListContextProvider } from './contexts/PokemonList.context'
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient()
 
 function App() {
 
@@ -14,7 +14,7 @@ function App() {
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </PokemonListContextProvider>
-  );
+  )
 }
 
-export default App;
+export default App
